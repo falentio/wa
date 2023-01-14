@@ -1,0 +1,22 @@
+{
+  "name": "wa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index",
+    "dev": "watchexec -rd 250 -w ./command -w index.js -- node index"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@adiwajshing/baileys": "^5.0.0",
+    "form-data": "^4.0.0",
+    "got": "^12.5.3",
+    "qrcode-terminal": "^0.12.0",
+    "sharp": "^0.30.7"
+  }
+}
