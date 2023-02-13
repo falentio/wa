@@ -25,6 +25,7 @@ RUN npm install
 FROM debian:bullseye
 
 LABEL fly_launch_runtime="nodejs"
+RUN apt-get update; apt-get install -y webp ffmpeg
 
 COPY --from=builder /root/.volta /root/.volta
 COPY --from=builder /app /app

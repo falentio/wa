@@ -1,44 +1,93 @@
 import { default as waSocket, useMultiFileAuthState } from "@adiwajshing/baileys"
+import Fuse from "fuse.js"
+import fs from "fs/promises"
 
-import ping from "./command/ping.js"
+import cat from "./command/cat.js"
+import doujin from "./command/doujin.js"
+import melong from "./command/melong.js"
+import menu from "./command/menu.js"
+import otakudesu from "./command/otakudesu.js"
 import pdf from "./command/pdf.js"
+import ping from "./command/ping.js"
 import sticker from "./command/sticker.js"
+import ygo from "./command/ygo.js"
 
-const prod = process.env.NODE_ENV == "production"
-const commands = new Map()
 function cmd(c, fn) {
-	for (const k of c) {
-		commands.set(k, fn)
+	for (const cmd of c) {
+		cmds.push({ cmd, fn })
 	}
 }
-cmd(["ping"], ping)
-cmd(["pdf", "p"], pdf)
-cmd(["sticker", "s", "stick", "sk"], sticker)
 
+const prod = process.env.NODE_ENV == "production"
+const prefix = process.env.PREFIX || "."
 const { state, saveCreds } = await useMultiFileAuthState("auth_data")
 
-const socket = waSocket.default({
-	printQRInTerminal: true,
-	auth: state,
-})
+const cmds = []
+cmd(["cat"], cat)
+cmd(["doujin"], doujin)
+cmd(["melong"], melong)
+cmd(["menu"], menu)
+cmd(["otakudesu", "od"], otakudesu)
+cmd(["pdf", "p"], pdf)
+cmd(["ping"], ping)
+cmd(["sticker", "s", "stick", "sk"], sticker)
+cmd(["ygo"], ygo)
 
-socket.ev.on("creds.update", saveCreds)
+const commands = new Fuse(cmds, { keys: ["cmd"] })
 
-socket.ev.on("messages.upsert", async m => {
-	const msg = m.messages[0]
-	!prod && console.log({ msg })
+start()
+async function start() {
+	const socket = waSocket.default({
+		printQRInTerminal: true,
+		auth: state,
+	})
 
-	const text = msg.message?.conversation || msg.message.extendedTextMessage?.text || ""
-	if (text[0] !== ".") {
-		return
-	}
+	socket.ev.on("creds.update", saveCreds)
+	socket.ev.on("connection.update", (update) => {
+		if (update.connection === "close") {
+			start()
+		}
+	})
 
-	const command = text.split(" ")[0].slice(1).trim()
-	const fn = commands.get(command)
-	!prod && console.log({ command, fn })
-	if (fn) {
-		fn(socket, msg, text)
-	}
-})
+	socket.ev.on("messages.upsert", async m => {
+		try {
+			const msg = m.messages[0]
+			if (msg.key.fromMe) {
+				return
+			}
+			!prod && console.log(JSON.stringify({ msg }, null, "\t"))
+			const [type] = Object.keys(msg.message)
+
+			let text = msg.message?.conversation || 
+				msg.message?.extendedTextMessage?.text ||
+				msg.message.imageMessage?.caption || 
+				""
+			if (!text.startsWith(prefix)) {
+				return
+			}
+
+			let command = text.slice(prefix.length).split(/[^\w]/gi)[0].trim()
+			const [result] = commands.search(command)
+			if (!result) {
+				return socket.sendMessage(msg.key.remoteJid, { text: "perintah tidak diketahui"}, { quoted: msg })
+			}
+			const { fn, cmd } = result.item
+			text = text.slice(prefix.length)
+			!prod && console.log({ command, fn })
+			fn && await fn(socket, msg, {
+				text,
+				prefix,
+				cmd,
+			})
+		} catch (e) {
+			console.error(e)
+			// await socket.sendMessage(msg.key.remoteJid, { text: "unknown error" })
+		}
+	})
+}
 
 console.log("starting bot")
+console.log("prfix: ", prefix)
+
+await fs.rm("auth_data/tmp", { recursive: true, force: true }).catch(() => {})
+await fs.mkdir("auth_data/tmp", { recursive: true })
