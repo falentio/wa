@@ -7,7 +7,6 @@ import WebP from "node-webpmux"
 
 export default async function(socket, msg, { text }) {
 	const media = getMedia(msg.message)
-	console.log(media)
 	if (!media) {
 		return socket.sendMessage(msg.key.remoteJid, { text: "reply atau kirim pesan dengan gambar" })
 	}
@@ -57,10 +56,10 @@ async function metadata(pack, author) {
 
 	const exif = Buffer.concat([
 		Buffer.from([0x49, 0x49, 0x2A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41, 0x57, 0x07, 0x00]),
-		Buffer.from([len & 0xff, len >> 8 & 0xff, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00]),
+		Buffer.from([0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00]),
 	    b,
 	])
-	exif.writeUIntLE(json.length, 14, 4)
+	exif.writeUIntLE(len, 14, 4)
 
 	await fs.writeFile(url, exif)
 

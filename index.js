@@ -42,16 +42,8 @@ async function start() {
 		auth: state,
 	})
 
-	socket.ev.on("creds.update", saveCreds)
-	socket.ev.on("connection.update", (update) => {
-		if (update.connection === "close") {
-			start()
-		}
-	})
-
-	socket.ev.on("messages.upsert", async m => {
+	const handleMessage =  async msg => {
 		try {
-			const msg = m.messages[0]
 			if (msg.key.fromMe) {
 				return
 			}
@@ -83,6 +75,17 @@ async function start() {
 			console.error(e)
 			// await socket.sendMessage(msg.key.remoteJid, { text: "unknown error" })
 		}
+	}
+	
+	socket.ev.on("creds.update", saveCreds)
+	socket.ev.on("connection.update", (update) => {
+		if (update.connection === "close") {
+			start()
+		}
+	})
+	socket.ev.on("messages.upsert", async m => {
+		const pending = m.messages.map(handleMessage)
+		await Promise.allSettled(pending)
 	})
 }
 
