@@ -1,5 +1,5 @@
 # wsgi: dotted.module:entry_point
-worker: node ./index.js
+web: npm start
 release: npm i
 # static: /:public,/somepath:somedir
 # cron: */5 * * * * python batch.py
