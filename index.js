@@ -42,6 +42,7 @@ async function start() {
 	const socket = waSocket.default({
 		printQRInTerminal: true,
 		auth: state,
+		syncFullHistory: true,
 	})
 
 	const handleMessage =  async msg => {
@@ -86,6 +87,7 @@ async function start() {
 		}
 	})
 	socket.ev.on("messages.upsert", async m => {
+		console.log(m.messages)
 		const pending = m.messages.map(handleMessage)
 		await Promise.allSettled(pending)
 	})
