@@ -7,6 +7,7 @@ import doujin from "./command/doujin.js"
 import melong from "./command/melong.js"
 import menu from "./command/menu.js"
 import otakudesu from "./command/otakudesu.js"
+import ingfokan from "./command/ingfokan.js"
 import pdf from "./command/pdf.js"
 import ping from "./command/ping.js"
 import sticker from "./command/sticker.js"
@@ -28,6 +29,7 @@ cmd(["doujin"], doujin)
 cmd(["melong"], melong)
 cmd(["menu"], menu)
 cmd(["otakudesu", "od"], otakudesu)
+cmd(["ingfokan"], ingfokan)
 cmd(["pdf", "p"], pdf)
 cmd(["ping"], ping)
 cmd(["sticker", "s", "stick", "sk"], sticker)
@@ -73,10 +75,10 @@ async function start() {
 			})
 		} catch (e) {
 			console.error(e)
-			// await socket.sendMessage(msg.key.remoteJid, { text: "unknown error" })
+			await socket.sendMessage(msg.key.remoteJid, { text: "maaf, gagal memproses perintah anda" })
 		}
 	}
-	
+
 	socket.ev.on("creds.update", saveCreds)
 	socket.ev.on("connection.update", (update) => {
 		if (update.connection === "close") {
