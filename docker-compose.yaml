@@ -1,3 +1,4 @@
 services:
   wa:
     build: .
+    restart: always
