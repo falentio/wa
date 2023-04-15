@@ -1,6 +1,6 @@
 # wsgi: dotted.module:entry_point
 web: node ./index.js
-# release: make PROD=1
+release: npm i
 # static: /:public,/somepath:somedir
 # cron: */5 * * * * python batch.py
 # somepyworker: python somescript.py
