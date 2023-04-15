@@ -2,3 +2,5 @@ services:
   wa:
     build: .
     restart: always
+    volumes:
+      - ./auth_data:/app/auth_data
