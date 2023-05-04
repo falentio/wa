@@ -15,8 +15,8 @@ export default async function(socket, msg, { text }) {
 	const url = `./auth_data/tmp/sticker-${new Date().toISOString()}.webp`
 	let [, pack, author] = text.split("\n")
 	if (!pack) {
-		pack = msg.pushName
-		author = "."
+		pack = "topup game termurah, hanya di"
+		author = "https://topup.falentio.com"
 	}
 
 	const exif = await metadata(pack, author)
