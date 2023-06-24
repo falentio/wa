@@ -48,7 +48,7 @@ async function start() {
 
 	const handleMessage =  async msg => {
 		try {
-			if (msg.key.fromMe) {
+			if (msg.key.fromMe &&!msg.message) {
 				return
 			}
 			!prod && console.log(JSON.stringify({ msg }, null, "\t"))
