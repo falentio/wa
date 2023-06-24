@@ -1,4 +1,4 @@
-import { default as waSocket, useMultiFileAuthState } from "@adiwajshing/baileys"
+import { default as waSocket, useMultiFileAuthState } from "@whiskeysockets/baileys"
 import Fuse from "fuse.js"
 import fs from "fs/promises"
 
