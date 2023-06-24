@@ -39,6 +39,7 @@ const commands = new Fuse(cmds, { keys: ["cmd"] })
 
 start()
 async function start() {
+	/** @type {ReturnType<typeof waSocket>} */
 	const socket = waSocket.default({
 		printQRInTerminal: true,
 		auth: state,
